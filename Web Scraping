@@ -1,0 +1,30 @@
+import requests
+from bs4 import BeautifulSoup
+import csv
+
+url = 'https://example.com/products'
+
+response = requests.get(url)
+
+if response.status_code == 200:
+    
+    soup = BeautifulSoup(response.text, 'html.parser')
+    
+    
+    with open('product_data.csv', 'w', newline='', encoding='utf-8') as csv_file:
+        csv_writer = csv.writer(csv_file)
+        
+        
+        csv_writer.writerow(['Product Name', 'Price', 'Rating'])
+        
+        product_list = soup.find_all('div', class_='product')
+        for product in product_list:
+            product_name = product.find('h2', class_='product-name').text.strip()
+            product_price = product.find('span', class_='product-price').text.strip()
+            product_rating = product.find('span', class_='product-rating').text.strip()
+            
+            csv_writer.writerow([product_name, product_price, product_rating])
+            
+    print("Scraping and data extraction complete. Data has been saved to 'product_data.csv'.")
+else:
+    print("Failed to retrieve the web page. Status code:", response.status_code)
